@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# Chess
+# Ches
 Game chess with socket and session
 =======
 # chessboard.js
