@@ -1,0 +1,23 @@
+{
+  "author": "moi",
+  "name": "moi",
+  "description": "JavaScript chessboard",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/oakmac/chessboardjs.git"
+  },
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "chess.js": "^0.11.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "socket.io": "^3.1.2"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
