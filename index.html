@@ -23,8 +23,7 @@
 
 </head>
 
-<body onload="reloadChess(cookieName)">
-
+<body onload="reloadChess(cookieGameData)">
   <div id="board1" style="width: 400px"></div>
   <div id="teste"></div>
   <label>Status:</label>
@@ -33,7 +32,7 @@
   <div id="fen"></div>
   <label>PGN:</label>
   <div id="pgn"></div>
-  <button onclick="reloadChess(cookieName)">Click me</button>
+  <button onclick="reloadChess(cookieGameData)">Click me</button>
 </body>
 
 
@@ -41,12 +40,15 @@
 <script>
 
 
+
+
   var person = prompt("write w or b (white,black");
 
-  console.log(person)
-  console.log(document.cookie)
 
-  var cookieName = getCookie('GameData')
+  console.log(person)
+  //console.log(document.cookie)
+
+  var cookieGameData = getCookie('GameData')
 
   function getCookie(cname) {
     var name = cname + "=";
@@ -73,7 +75,7 @@
 
 
 
-  //   var board = Chessboard('board1', 'start')
+
 
   var socket = io()
   socket.on('move', (msg) => {
@@ -168,8 +170,6 @@
 
     $status.html(status)
     $fen.html(game.fen())
-    //socket.emit('data', game.$fen())
-    //  a = getCookie('name')
     $pgn.html(game.pgn())
   }
 
@@ -193,13 +193,7 @@
     }
 
   }
-  /*
-  
-  
-  window.onload = function loadBoard() {
-  reloadChess('r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19')
-  }
-  */
+
   var fenText = game.fen();
   var colorUser = fenText.split(' ');
 
