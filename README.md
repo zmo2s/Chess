@@ -1,2 +1,2 @@
 # Chess
-Game echess with socket and session
+Game chess with socket and session
