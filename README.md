@@ -1,4 +1,4 @@
-# Ches
+# Chess
 Game chess with socket and session
 =======
 # chessboard.js
