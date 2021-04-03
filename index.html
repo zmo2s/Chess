@@ -1,0 +1,269 @@
+<html>
+<head>
+
+  <link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+      crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+  crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+  integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+  crossorigin="anonymous"></script>
+  <script src="./node_modules/chess.js/chess.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+
+
+  <!--  Including jQuery, another tool chessboardjs uses:-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+
+
+  </head>
+<body onload="reloadChess(a)" >
+  
+  <div id="board1" style="width: 400px"></div>
+<div id ="teste"></div>
+  <label>Status:</label>
+<div id="status"></div>
+<label>FEN:</label>
+<div id="fen"></div>
+<label>PGN:</label>
+<div id="pgn"></div>
+<button onclick="reloadChess(a)">Click me</button>
+  </body>
+
+
+
+<!--
+  Now including our own custom JS
+  Note that we could write JS directly in between the script tags if you'd
+  rather, but i didn't want to so i put it in a new file.
+-->
+  <script>
+
+
+var person = prompt("write w or b (white,black");
+
+console.log(person)
+console.log(document.cookie)
+
+//document.cookie = "name=John; expires=Thu, 01 Jan 2023 00:00:01 GMT";
+//document.cookie = "name1="+document.cookie+"; expires=Thu, 01 Jan 2023 00:00:01 GMT"
+//console.log(document.cookie)
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+var a = getCookie('name')
+
+
+
+
+
+
+//a=a+1
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+
+   
+ //   var board = Chessboard('board1', 'start')
+    
+    var socket = io()
+    socket.on('move', (msg)=>
+    {
+      position = msg.split('-')
+      onDrop(position[0], position[1])
+      onSnapEnd()
+      
+    
+    });
+
+    socket.on('connectToRoom',function(data) {
+         document.getElementById("teste").innerText=data
+      });
+
+     
+/*
+    socket.on("set username", () => {
+    socket.username = username;
+  });
+
+    socket.on('color', (person)=>
+    {
+      socket.emit('color', person)
+      
+    
+    })
+*/
+
+//
+// function onDragStart (source, piece, position, orientation) {
+//   console.log('Drag started:')
+//   console.log('Source: ' + source)
+//   console.log('Piece: ' + piece)
+//   console.log('Position: ' + Chessboard.objToFen(position))
+//   console.log('Orientation: ' + orientation)
+//   console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+// }
+//
+// var config = {
+//   draggable: true,
+//   position: 'start',
+//   onDragStart: onDragStart,
+//   sparePieces: true
+// }
+//  board = Chessboard('board1', config)
+ //
+ // board.move('e2-e4')
+ //  board.move('d2-d4', 'g8-f6')
+
+
+// NOTE: this example uses the chess.js library:
+// https://github.com/jhlywa/chess.js
+
+
+var game = new Chess()
+var $status = $('#status')
+var $fen = $('#fen')
+var $pgn = $('#pgn')
+
+
+
+
+function onDragStart (source, piece, position, orientation) {
+  // do not pick up pieces if the game is over
+  if (game.game_over()) return false
+
+  // only pick up pieces for the side to move
+  if ((person == "w" && piece.search(/^b/) !== -1 ) ||
+      (person =="b" && piece.search(/^w/) !== -1 )) {
+    return false
+  }
+}
+
+function onDrop (source, target) {
+  // see if the move is legal
+  var move = game.move({
+    from: source,
+    to: target,
+    promotion: 'q' // NOTE: always promote to a queen for example simplicity
+  })
+
+  
+ 
+
+  // illegal move
+  if (move === null) return 'snapback'
+
+  var msg = `${source}-${target}`
+
+  socket.emit('move', msg)
+
+  setCookie("name",game.fen(),100)
+
+  updateStatus()
+}
+
+// update the board position after the piece snap
+// for castling, en passant, pawn promotion
+function onSnapEnd () {
+  board.position(game.fen())
+}
+
+function updateStatus () {
+  var status = ''
+
+  var moveColor = 'White'
+  if (game.turn() === 'b') {
+    moveColor = 'Black'
+  }
+
+  // checkmate?
+  if (game.in_checkmate()) {
+    status = 'Game over, ' + moveColor + ' is in checkmate.'
+  }
+
+  // draw?
+  else if (game.in_draw()) {
+    status = 'Game over, drawn position'
+  }
+
+  // game still on
+  else {
+    status = moveColor + ' to move'
+
+    // check?
+    if (game.in_check()) {
+      status += ', ' + moveColor + ' is in check'
+    }
+  }
+
+
+
+  $status.html(status)
+  $fen.html(game.fen())
+  //socket.emit('data', game.$fen())
+  //  a = getCookie('name')
+  $pgn.html(game.pgn())
+}
+
+var config = {
+  draggable: true,
+  position: 'start',
+  onDragStart: onDragStart,
+  onDrop: onDrop,
+  onSnapEnd: onSnapEnd
+}
+board = Chessboard('board1', config)
+
+updateStatus()
+
+function reloadChess(str)
+{ if(str !="")
+{
+config.position=str
+
+game = new Chess(str)
+onSnapEnd()
+}
+
+}
+/*
+
+
+window.onload = function loadBoard() {
+reloadChess('r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19')
+}
+*/
+var fenText = game.fen();
+var colorUser = fenText.split(' ');
+
+
+console.log(fenText);
+console.log(colorUser[1])
+
+
+
+
+  </script>
+</html>
