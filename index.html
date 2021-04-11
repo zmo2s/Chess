@@ -41,7 +41,20 @@
 
 
 
-var person = prompt("write w or b (white,black");
+if (document.cookie.split(';').some((item) => item.trim().startsWith('reader='))) {
+
+  var wz = getCookie('GameData').split(' ');
+
+  person = wz[1];
+}
+else {
+
+
+  var person = prompt("write w or b (white,black");
+}
+setCookie("reader", "reader", 100)
+
+
 
   console.log(person)
   //console.log(document.cookie)
@@ -192,15 +205,15 @@ var person = prompt("write w or b (white,black");
 
   }
 
+
+
+
   var fenText = game.fen();
   var colorUser = fenText.split(' ');
 
 
   console.log(fenText);
   console.log(colorUser[1])
-
-
-
 
 </script>
 
