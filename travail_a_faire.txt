@@ -1,0 +1,2 @@
+bouton qui delete les cookies GameData et et read le bouton s'apellera commencer ou recommencer uen partie
+
