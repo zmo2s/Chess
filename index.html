@@ -33,6 +33,7 @@
   <label>PGN:</label>
   <div id="pgn"></div>
   <button onclick="reloadChess(cookieGameData)">Click me</button>
+  <button onclick="deleteCookie('GameData')">Nouvelle partie</button>
 </body>
 
 
@@ -70,13 +71,22 @@ var person = prompt("write w or b (white,black");
     var expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
   }
-
+  function deleteCookie(cname)
+  {
+    setCookie(cname, 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', -1);
+    reloadChess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+    socket.emit('move', 'reset')
+  }
 
 
 
 
   var socket = io()
   socket.on('move', (msg) => {
+    if(msg === 'reset')
+    {
+      reloadChess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+    }
     position = msg.split('-')
     onDrop(position[0], position[1])
     onSnapEnd()
