@@ -1,0 +1,3 @@
+fiare un bouton qui delete les  cokkies Gamedata et reader qui s'apelle reocmmencer uen game  ou commencer 
+
+
